@@ -1,15 +1,15 @@
 {
-  "name": "aws-blog-serverless",
+  "name": "aws-blog-services",
   "version": "0.1.0",
   "bin": {
-    "aws-blog-serverless": "bin/aws-blog-serverless.js"
+    "aws-blog-services": "bin/aws-blog-services.js"
   },
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "deploy": "tsc && sh build.sh && cdk deploy --profile=rodo"
+    "deploy": "tsc && sh build.sh && cdk deploy --profile=rodo && sh flush.sh"
   },
   "devDependencies": {
     "@aws-cdk/assert": "1.56.0",
@@ -23,9 +23,12 @@
   },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "1.56.0",
+    "@aws-cdk/aws-cloudfront": "^1.56.0",
     "@aws-cdk/aws-dynamodb": "1.56.0",
     "@aws-cdk/aws-ec2": "^1.56.0",
     "@aws-cdk/aws-lambda": "1.56.0",
+    "@aws-cdk/aws-s3": "^1.56.0",
+    "@aws-cdk/aws-s3-deployment": "^1.56.0",
     "@aws-cdk/core": "1.56.0",
     "source-map-support": "^0.5.16"
   }

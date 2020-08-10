@@ -1,4 +1,0 @@
-{
-    "tableName" : "article",
-    "tableAttributes": "id,createdAt,updatedAt,fullname"
-}

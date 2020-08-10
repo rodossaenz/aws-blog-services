@@ -1,0 +1,4 @@
+{
+    "tableName" : "rodosdev-table-post",
+    "tableAttributes": "id,createdAt,updatedAt,title,thumbnail,intro,postViews"
+}
