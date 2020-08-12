@@ -29,11 +29,18 @@ export class AwsBlogServicesStack extends cdk.Stack {
     /**
      * DYNAMODB
      */
-    const articleTable = new DynamoDB.Table(this, "rodosdev-table-post", {
-      partitionKey: { name: "id", type: DynamoDB.AttributeType.STRING },
+    const postTable = new DynamoDB.Table(this, "rodosdev-table-post", {
       tableName: "rodosdev-table-post",
+      partitionKey: { name: "id", type: DynamoDB.AttributeType.STRING },
       billingMode: DynamoDB.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY
+    });
+
+    postTable.addGlobalSecondaryIndex({
+      partitionKey: { name: "postType", type: DynamoDB.AttributeType.STRING },
+      sortKey: { name: "createdAt", type: DynamoDB.AttributeType.NUMBER },
+      indexName: "rodosdev-index-post-createdAt",
+      projectionType: DynamoDB.ProjectionType.ALL
     });
 
     /**
@@ -46,7 +53,7 @@ export class AwsBlogServicesStack extends cdk.Stack {
       layerVersionName: "NODEJS_LAYER"
     });
 
-    const articleCrudFunction = new Lambda.Function(this, "rodosdev-function-crud-post", {
+    const postCrudFunction = new Lambda.Function(this, "rodosdev-function-crud-post", {
       runtime: Lambda.Runtime.NODEJS_12_X,
       code: new Lambda.AssetCode('functions/repository'),
       handler: "post.handler",
@@ -56,29 +63,29 @@ export class AwsBlogServicesStack extends cdk.Stack {
       vpcSubnets: blogVpc.selectSubnets()
     });
 
-    articleCrudFunction.addLayers(nodejsLayer);
-    articleTable.grantReadWriteData(articleCrudFunction);
+    postCrudFunction.addLayers(nodejsLayer);
+    postTable.grantReadWriteData(postCrudFunction);
 
     /**
      * API GATEWAY
      */
 
-    const articleLambdaIntegration = new APIGateway.LambdaIntegration(articleCrudFunction);
+    const postLambdaIntegration = new APIGateway.LambdaIntegration(postCrudFunction);
 
     const blogAPI = new APIGateway.LambdaRestApi(this, 'rodosdev-api', {
-      handler: articleCrudFunction,
+      handler: postCrudFunction,
       restApiName: 'rodosdev-api',
       proxy: false
     });
 
     const postsResource = blogAPI.root.addResource('post');
-    postsResource.addMethod('POST', articleLambdaIntegration);
-    postsResource.addMethod('GET', articleLambdaIntegration);
+    postsResource.addMethod('POST', postLambdaIntegration);
+    postsResource.addMethod('GET', postLambdaIntegration);
 
     const postResource = postsResource.addResource('{id}');
-    postResource.addMethod('GET', articleLambdaIntegration);
-    postResource.addMethod('PUT', articleLambdaIntegration);
-    postResource.addMethod('DELETE', articleLambdaIntegration);
+    postResource.addMethod('GET', postLambdaIntegration);
+    postResource.addMethod('PUT', postLambdaIntegration);
+    postResource.addMethod('DELETE', postLambdaIntegration);
 
     addCorsOptions(postsResource);
     addCorsOptions(postResource);

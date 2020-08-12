@@ -30,24 +30,25 @@ async function repository(event: any = {}, schema: any) {
           };
 
           const result = await dynamodb.get(params).promise();
-          body = result.Item;
+          body = result.Item || {};
 
         } else {
 
+          let ExclusiveStartKey;
+
           var params = {
             TableName : tableName,
+            IndexName : schema.indexQueryName,
+            KeyConditionExpression: 'postType = :postType',
+            ExpressionAttributeValues: { ':postType': 'article' },
             ProjectionExpression: schema.tableAttributes,
-            KeyConditionExpression: "#time >= :time",
-            ExpressionAttributeNames:{
-                "#time": "createdAt"
-            },
-            ExpressionAttributeValues: {
-                ":time": new Date().getTime()
-            }
+            ScanIndexForward: true,
+            ExclusiveStartKey,
+            Limit: 10
           };
         
           const result = await dynamodb.query(params).promise();
-          body = result.Items;
+          body = result.Items || [];
 
         }
 

@@ -1,4 +1,5 @@
 {
     "tableName" : "rodosdev-table-post",
-    "tableAttributes": "id,createdAt,updatedAt,title,thumbnail,intro,postViews"
+    "tableAttributes": "id,createdAt,updatedAt,postType,title,thumbnail,intro,postViews",
+    "indexQueryName": "rodosdev-index-post-createdAt"
 }
